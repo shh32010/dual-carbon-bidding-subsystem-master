@@ -9,10 +9,10 @@
             <tr>
               <th class="col-category">服务类别</th>
               <th class="col-item">服务项目</th>
-              <th v-for="product in products" :key="product.id" class="col-product">
+              <th v-for="product in products" :key="product.goodsId" class="col-product">
                 <div class="product-header-cell">
-                  <div class="product-name">{{ product.name }}</div>
-                  <div class="product-price">{{ product.price }}元/{{ product.period }}</div>
+                  <div class="product-name">{{ product.goodsName }}</div>
+                  <div class="product-price">{{ product.price }}元/年</div>
                   <el-button type="primary" size="small" class="buy-btn" @click="goBuy(product)">
                     立即购买
                   </el-button>
@@ -25,13 +25,13 @@
             <tr class="tr-category">
               <td rowspan="2" class="category-cell">信息服务</td>
               <td class="item-cell">短信订阅</td>
-              <td v-for="p in products" :key="p.id" class="value-cell center">
+              <td v-for="p in products" :key="p.goodsId" class="value-cell center">
                 {{ p.hasInfoPush === '1' ? '√' : '×' }}
               </td>
             </tr>
             <tr>
               <td class="item-cell">短信推送</td>
-              <td v-for="p in products" :key="p.id" class="value-cell center">
+              <td v-for="p in products" :key="p.goodsId" class="value-cell center">
                 {{ p.hasSms === '1' ? '√' : '×' }}
               </td>
             </tr>
@@ -40,13 +40,13 @@
             <tr class="tr-category">
               <td rowspan="2" class="category-cell">客服服务</td>
               <td class="item-cell">专属人工客服</td>
-              <td v-for="p in products" :key="p.id" class="value-cell center">
+              <td v-for="p in products" :key="p.goodsId" class="value-cell center">
                 {{ p.hasExclusiveService === '1' ? '√' : '×' }}
               </td>
             </tr>
             <tr>
               <td class="item-cell">电脑远程服务</td>
-              <td v-for="p in products" :key="p.id" class="value-cell center">
+              <td v-for="p in products" :key="p.goodsId" class="value-cell center">
                 {{ p.remoteCount }}
               </td>
             </tr>
@@ -55,19 +55,19 @@
             <tr class="tr-category">
               <td rowspan="3" class="category-cell">增值服务</td>
               <td class="item-cell">数字证书服务</td>
-              <td v-for="p in products" :key="p.id" class="value-cell center">
+              <td v-for="p in products" :key="p.goodsId" class="value-cell center">
                 {{ p.hasDigitalCert === '1' ? '√' : '×' }}
               </td>
             </tr>
             <tr>
               <td class="item-cell">商业信息服务</td>
-              <td v-for="p in products" :key="p.id" class="value-cell center">
+              <td v-for="p in products" :key="p.goodsId" class="value-cell center">
                 {{ p.hasCreditReport === '1' ? '√' : '×' }}
               </td>
             </tr>
             <tr>
               <td class="item-cell">咨询评估报告</td>
-              <td v-for="p in products" :key="p.id" class="value-cell center">
+              <td v-for="p in products" :key="p.goodsId" class="value-cell center">
                 {{ p.hasConsultReport === '1' ? '√' : '×' }}
               </td>
             </tr>
@@ -85,26 +85,22 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import SiteHeader from '@/layout/components/platform/Header.vue'
-import SiteFooter from '@/layout/components/platform/SiteFooter.vue'
-import { productList } from '@/api/member/member'
+import { goodsList } from '@/api/member/member'
 
 const router = useRouter()
 const products = ref([])
 
 const loadProducts = async () => {
   try {
-    const res = await productList()
-    if (res.code === 200) {
-      products.value = res.data || []
-    }
+    const res = await goodsList()
+    products.value = res.rows || []
   } catch (e) {
-    console.error(e)
+    products.value = []
   }
 }
 
 const goBuy = (product) => {
-  router.push({ path: '/member/recharge', query: { productId: product.id } })
+  router.push({ path: '/member/recharge', query: { goodsId: product.goodsId } })
 }
 
 onMounted(() => {

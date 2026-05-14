@@ -112,7 +112,7 @@ async function loadPost() {
   try {
     const res = await getPost(postId)
     if (res.code === 200) {
-      post.value = res.data?.post || {}
+      post.value = res.data || {}
       comments.value = res.data?.comments || []
     } else {
       ElMessage.error(res.msg || '加载失败')

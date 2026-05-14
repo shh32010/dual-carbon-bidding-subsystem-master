@@ -25,36 +25,33 @@
 
 <script setup>
 import { ref, nextTick } from 'vue'
-import { chat } from '@/api/member/member' // 恢复后端接口引入
+import { getAnswer } from '@/api/chat/qa'
 
 const messages = ref([
-  { role: 'ai', content: '你好！我是智能助手，有什么可以帮你的吗？' } // 恢复原角色名
+  { role: 'ai', content: '你好！我是智能助手，有什么可以帮你的吗？' }
 ])
 const inputMsg = ref('')
-const aiLoading = ref(false) // 恢复 loading 状态
+const aiLoading = ref(false)
 const msgContainer = ref(null)
 
 const send = async () => {
   const text = inputMsg.value.trim()
   if (!text || aiLoading.value) return
-  
-  // 添加用户消息
+
   messages.value.push({ role: 'user', content: text })
   inputMsg.value = ''
   aiLoading.value = true
   scrollToBottom()
 
   try {
-    // 恢复原后端接口调用
-    const res = await chat(text)
-    if (res.code === 200) {
-      messages.value.push({ role: 'ai', content: res.data || '抱歉，暂未获取到回答。' })
+    const res = await getAnswer(text)
+    if (res.data && res.data.length > 0) {
+      messages.value.push({ role: 'ai', content: res.data[0].answer || '抱歉，暂未获取到回答。' })
     } else {
-      messages.value.push({ role: 'ai', content: res.msg || 'AI 服务暂时不可用。' })
+      messages.value.push({ role: 'ai', content: '抱歉，您的问题暂时无法回复。' })
     }
   } catch (e) {
-    // 恢复原错误提示
-    messages.value.push({ role: 'ai', content: 'AI 连接失败，请确保 Ollama 已启动（localhost:11434）。' })
+    messages.value.push({ role: 'ai', content: 'AI 连接失败，请稍后再试。' })
   } finally {
     aiLoading.value = false
     scrollToBottom()
