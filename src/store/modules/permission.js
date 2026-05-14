@@ -84,8 +84,7 @@ function filterChildren(childrenMap) {
 
 const viewModules = import.meta.glob('@/views/**/*.vue')
 export const loadView = (view) => {
-  return viewModules[/src/views/ + view + .vue]
-}`], resolve)
+  return viewModules[`/src/views/${view}.vue`]
 }
 
 export default permission

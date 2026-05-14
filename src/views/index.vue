@@ -37,25 +37,20 @@ import {listBidding} from '@/api/bid/bidding'
 import {listBanner} from '@/api/bid/banner'
 import { getBaseUrl } from '@/utils/env'
 
+const fallbackImgs = [
+  new URL('../assets/images/banner1.png', import.meta.url).href,
+  new URL('../assets/images/banner2.png', import.meta.url).href,
+  new URL('../assets/images/banner3.png', import.meta.url).href,
+]
+
 export default {
   components: {HomeCard , DragButton },
   data() {
     return {
-      swiperOption: {
-        autoplay: {
-          delay: 1500,
-        },
-        slidesPerView: 'auto',
-        centeredSlides: true,
-        spaceBetween: 30,
-        loop: true,
-        activeIndex: 2,
-      },
-
       images: [
-        { id: 1, url: new URL('../assets/images/banner1.png', import.meta.url).href },
-        { id: 2, url: new URL('../assets/images/banner2.png', import.meta.url).href },
-        { id: 3, url: new URL('../assets/images/banner3.png', import.meta.url).href },
+        { id: 1, url: fallbackImgs[0] },
+        { id: 2, url: fallbackImgs[1] },
+        { id: 3, url: fallbackImgs[2] },
       ],
       bidData1: undefined,
       bidData2: undefined,
@@ -76,14 +71,7 @@ export default {
           })
         }
       } catch (e) {
-        // API 不可用时使用本地 banner
-      }
-      if (!this.images || this.images.length === 0) {
-        this.images = [
-          { id: 1, url: new URL('../assets/images/banner1.png', import.meta.url).href },
-          { id: 2, url: new URL('../assets/images/banner2.png', import.meta.url).href },
-          { id: 3, url: new URL('../assets/images/banner3.png', import.meta.url).href },
-        ]
+        // API 不可用时使用 data 中的本地 banner
       }
       try {
         this.bidData1 = (await listBidding({category: 5})).rows
@@ -99,6 +87,12 @@ export default {
 
     jumpTo(id) {
       this.$router.push(`/bid/detail?id=${id}`)
+    },
+
+    handleImgError(e, image) {
+      const idx = this.images.indexOf(image)
+      const newUrl = fallbackImgs[idx % fallbackImgs.length]
+      this.images.splice(idx, 1, { ...image, url: newUrl })
     },
   },
   mounted() {
